@@ -4,6 +4,8 @@ import {ArtifactOptions, BootBindings, ServiceDefaults} from "@loopback/boot";
 import {DataSource} from "@loopback/repository";
 import {TransactionalMixin} from "./transactional.mixin";
 
+const DATASOURCE_TAG = 'transactional';
+
 export class ServiceBooter extends BaseBooter {
 
     constructor(
@@ -12,7 +14,7 @@ export class ServiceBooter extends BaseBooter {
         @inject(BootBindings.PROJECT_ROOT) projectRoot: string,
         @inject(`${BootBindings.BOOT_OPTIONS}#services`)
         public serviceConfig: ArtifactOptions = {},
-        @inject.view(filterByTag('transactional'))
+        @inject.view(filterByTag(DATASOURCE_TAG))
         private readonly dataSources: ContextView<DataSource>,
     ) {
         super(
@@ -26,9 +28,9 @@ export class ServiceBooter extends BaseBooter {
     async modifyClass(cls: Constructor<object>): Promise<Constructor<object>> {
         const dataSources = await this.dataSources.values();
         if (dataSources.length === 0) {
-            throw Error(`Can not find data source for transaction. Must add @bind({tags:['forTransaction']} to data source class`);
+            throw Error(`Can not find data source for transaction. Must add @bind({tags:['${DATASOURCE_TAG}']} to data source class`);
         } else if (dataSources.length > 1) {
-            throw Error(`There must be only @bind({tags:['forTransaction']} data source`);
+            throw Error(`There must be only @bind({tags:['${DATASOURCE_TAG}']} data source`);
         }
         return TransactionalMixin(cls, dataSources[0]);
     }
