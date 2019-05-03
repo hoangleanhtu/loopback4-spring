@@ -74,7 +74,7 @@ export class UserService {
 ## Apply transaction to method
 
 1. Add `@transactional()` to method
-2. Append `options?: Options` to last parameter of method, it's automatically populated by `@transactional()
+2. Append `options?: Options` to last parameter of method, it's automatically populated by `@transactional()`
 3. Pass `options` to repository method
 
 ```typescript
