@@ -15,7 +15,7 @@ export enum IsolationLevel {
 
 export function transactional(spec?: TransactionalMetaData) {
     // tslint:disable-next-line:no-any
-    return function (target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value!;
         // tslint:disable-next-line:no-any
         descriptor.value = async function (...args: any[]) {

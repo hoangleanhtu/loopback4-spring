@@ -7,4 +7,4 @@ export declare enum IsolationLevel {
     SERIALIZABLE = "SERIALIZABLE",
     REPEATABLE_READ = "REPEATABLE READ"
 }
-export declare function transactional(spec?: TransactionalMetaData): (target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>) => void;
+export declare function transactional(spec?: TransactionalMetaData): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
