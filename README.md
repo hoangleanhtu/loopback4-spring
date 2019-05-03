@@ -17,6 +17,7 @@ npm i -S loopback4-spring
 ## Register SpringComponent
 ```typescript
 // Import here...
+import {SpringComponent} from "loopback4-spring";
 
 export class SpingLikedExampleApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -79,6 +80,7 @@ export class UserService {
 
 ```typescript
 // Import here...
+import {IsolationLevel, transactional} from "loopback4-spring";
 
 export class UserService {
 
@@ -114,6 +116,9 @@ export class UserService {
 
 ## Inject service in controller
 ```typescript
+// Other imports...
+import {service} from "loopback4-spring";
+
 export class UserController {
     constructor(
         @service(UserService)

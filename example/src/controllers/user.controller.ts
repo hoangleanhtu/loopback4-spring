@@ -4,10 +4,10 @@
 
 
 import {UserService} from "../services/user.service";
-import {service} from "../../../dist";
 import {get, param, post, requestBody} from "@loopback/openapi-v3";
 import {Customer, User} from "../models";
 import {model, property} from "@loopback/repository";
+import {service} from "loopback4-spring";
 
 @model()
 class UserAndCustomer {

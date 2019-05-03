@@ -1,8 +1,7 @@
 import {Options, repository} from "@loopback/repository";
 import {CustomerRepository, UserRepository} from "../repositories";
 import {Customer, User} from "../models";
-
-import {IsolationLevel, transactional} from "../../../dist";
+import {IsolationLevel, transactional} from "loopback4-spring";
 
 export class UserService {
 
