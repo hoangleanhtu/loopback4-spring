@@ -51,8 +51,8 @@ export class MysqlDataSource extends juggler.DataSource {
 }
 ```
 
-## Create `service` layer
-1. Create file with with suffix `.service.ts` in folder `src/services`
+## Create `service` classes
+1. Create file with suffix `.service.ts` in folder `src/services`
 2. Class name must be suffix by `Service`, e.g: `UserService`, then you can inject repository:
 
 ```typescript
@@ -110,4 +110,26 @@ export class UserService {
     }
 }
 
+```
+
+## Inject service in controller
+```typescript
+export class UserController {
+    constructor(
+        @service(UserService)
+        private userService: UserService
+    ) {
+    }
+    
+    // OpenAPI annotation...
+    async createUserAndCustomer(
+        @requestBody() userAndCustomer: UserAndCustomer,
+        @param.query.boolean('throwError') throwError: boolean = false
+    ) {
+        const {user, customer} = userAndCustomer;
+        return await this.userService.create(user, customer, throwError);
+    }
+ 
+    
+}
 ```
