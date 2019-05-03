@@ -9,12 +9,15 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
 import {MySequence} from './sequence';
+import {SpringComponent} from "../../dist";
 
 export class SpingLikedExampleApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
+
+    this.component(SpringComponent);
 
     // Set up the custom sequence
     this.sequence(MySequence);
