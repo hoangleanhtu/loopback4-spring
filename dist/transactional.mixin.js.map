@@ -1,0 +1,1 @@
+{"version":3,"file":"transactional.mixin.js","sourceRoot":"","sources":["../src/transactional.mixin.ts"],"names":[],"mappings":";;AAGA,kCAAkC;AAClC,SAAgB,kBAAkB,CAAgC,UAAa,EAAE,UAAsB;IACrG,UAAU,CAAC,SAAS,CAAC,qBAAqB,GAAG,UAAU,CAAC;IACxD,OAAO,UAAU,CAAC;AACpB,CAAC;AAHD,gDAGC"}
