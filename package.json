@@ -1,0 +1,35 @@
+{
+  "name": "loopback4-spring",
+  "version": "1.0.0",
+  "description": "Inspired by Spring framework",
+  "main": "index.js",
+  "scripts": {
+    "build": "lb-tsc es2017 --outDir dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoangleanhtu/loopback4-spring.git"
+  },
+  "files": [
+    "README.md",
+    "index.js",
+    "index.d.ts",
+    "dist",
+    "src",
+    "!*/__tests__"
+  ],
+  "author": "hoangleanhtu@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoangleanhtu/loopback4-spring/issues"
+  },
+  "homepage": "https://github.com/hoangleanhtu/loopback4-spring#readme",
+  "devDependencies": {
+    "@loopback/build": "^1.5.0"
+  },
+  "dependencies": {
+    "@loopback/boot": "^1.2.3",
+    "@loopback/core": "^1.6.0",
+    "@loopback/repository": "^1.5.1"
+  }
+}
