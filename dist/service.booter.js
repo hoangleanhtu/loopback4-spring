@@ -43,7 +43,7 @@ ServiceBooter = __decorate([
     __param(0, core_1.inject(core_1.CoreBindings.APPLICATION_INSTANCE)),
     __param(1, core_1.inject(boot_1.BootBindings.PROJECT_ROOT)),
     __param(2, core_1.inject(`${boot_1.BootBindings.BOOT_OPTIONS}#services`)),
-    __param(3, core_1.inject.view(core_1.filterByTag('applyTransaction'))),
+    __param(3, core_1.inject.view(core_1.filterByTag('transactional'))),
     __metadata("design:paramtypes", [core_1.Application, String, Object, core_1.ContextView])
 ], ServiceBooter);
 exports.ServiceBooter = ServiceBooter;

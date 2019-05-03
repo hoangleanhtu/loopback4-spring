@@ -12,7 +12,7 @@ export class ServiceBooter extends BaseBooter {
         @inject(BootBindings.PROJECT_ROOT) projectRoot: string,
         @inject(`${BootBindings.BOOT_OPTIONS}#services`)
         public serviceConfig: ArtifactOptions = {},
-        @inject.view(filterByTag('applyTransaction'))
+        @inject.view(filterByTag('transactional'))
         private readonly dataSources: ContextView<DataSource>,
     ) {
         super(
