@@ -19,6 +19,9 @@ function transactional(spec) {
             const dataSource = this.transactionDataSource;
             // tslint:disable-next-line:no-invalid-this
             const self = this;
+            if (!dataSource) {
+                return await method.apply(self, args);
+            }
             const connector = dataSource.connector;
             return await new Promise(((resolve, reject) => {
                 const isolationLevel = spec ? spec.isolationLevel : IsolationLevel.READ_COMMITTED;
