@@ -2,9 +2,6 @@ import {bind, inject} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 import * as config from './mysql.datasource.json';
 
-@bind({
-    tags: ['transactional']
-})
 export class MysqlDataSource extends juggler.DataSource {
   static dataSourceName = 'mysql';
 

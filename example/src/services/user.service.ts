@@ -1,7 +1,7 @@
-import {Options, repository} from "@loopback/repository";
+import {repository} from "@loopback/repository";
 import {CustomerRepository, UserRepository} from "../repositories";
 import {Customer, User} from "../models";
-import {IsolationLevel, transactional} from "loopback4-spring";
+import {transactional} from "../../../dist/transactional.decorator";
 
 export class UserService {
 
@@ -13,12 +13,12 @@ export class UserService {
     ) {
     }
 
-    @transactional({isolationLevel: IsolationLevel.READ_COMMITTED})
+    @transactional()
     async create(
         user: User,
         customer: Customer,
         throwError: boolean,
-        options?: Options // Options is populated by @transactional
+        options?: Object
     ): Promise<{user: User, customer: Customer}> {
 
         // Must pass options to propagate transaction

@@ -1,11 +1,51 @@
-version: '2'
+version: '3'
 
 services:
-  mysql:
-    image: 'mysql:8.0'
-    command: --default-authentication-plugin=mysql_native_password
+#  mysql:
+#    image: 'mysql:8.0'
+#    command: --default-authentication-plugin=mysql_native_password
+#    ports:
+#      - '3306:3306'
+#    environment:
+#      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+#      - MYSQL_DATABASE=example
+  mongodb-primary:
+    image: 'bitnami/mongodb:4.1'
     ports:
-      - '3306:3306'
+      - '27020:27020'
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=example
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_PORT_NUMBER=27020
+      - MONGODB_REPLICA_SET_MODE=primary
+    volumes:
+      - 'mongodb_master_data:/bitnami'
+
+  mongodb-secondary:
+    image: 'bitnami/mongodb:4.1'
+    ports:
+      - '27021:27021'
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_PORT_NUMBER=27021
+      - MONGODB_PRIMARY_HOST=host.docker.internal
+      - MONGODB_PRIMARY_PORT_NUMBER=27020
+
+  mongodb-arbiter:
+    image: 'bitnami/mongodb:4.1'
+    ports:
+      - '27022:27022'
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_PORT_NUMBER=27022
+      - MONGODB_PRIMARY_HOST=host.docker.internal
+      - MONGODB_PRIMARY_PORT_NUMBER=27020
+
+volumes:
+  mongodb_master_data:
+    driver: local
