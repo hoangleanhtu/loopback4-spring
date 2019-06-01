@@ -30,7 +30,7 @@ services:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
       - MONGODB_REPLICA_SET_MODE=secondary
       - MONGODB_PORT_NUMBER=27021
-      - MONGODB_PRIMARY_HOST=host.docker.internal
+      - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27020
 
   mongodb-arbiter:
@@ -43,7 +43,7 @@ services:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
       - MONGODB_REPLICA_SET_MODE=arbiter
       - MONGODB_PORT_NUMBER=27022
-      - MONGODB_PRIMARY_HOST=host.docker.internal
+      - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27020
 
 volumes:
