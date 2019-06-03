@@ -57,6 +57,7 @@
     "@loopback/service-proxy": "^1.1.6",
     "loopback-connector-mongodb": "github:hoangleanhtu/loopback-connector-mongodb",
     "loopback-connector-mysql": "^5.3.1",
+    "loopback-connector-postgresql": "^3.6.1",
     "loopback4-spring": "^1.0.2",
     "mongodb": "^3.2.6"
   },

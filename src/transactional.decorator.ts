@@ -91,10 +91,18 @@ export function transactional(spec?: TransactionalMetaData | Object) {
                 return await new Promise(((resolve, reject) => {
                     const isolationLevel: IsolationLevel = spec ? (<TransactionalMetaData>spec).isolationLevel : IsolationLevel.READ_COMMITTED;
                     // @ts-ignore
-                    connector.beginTransaction(isolationLevel, async function (error, connection) {
+                    connector.beginTransaction(isolationLevel, async function (error, connectionOrTransaction) {
                         if (error) {
                             return reject(error);
                         }
+
+                        const isTransaction = connectionOrTransaction.connection !== undefined;
+
+                        const transaction = isTransaction ? connectionOrTransaction :
+                            new Transaction(connector, connectionOrTransaction);
+
+                        const connection = isTransaction ? (<Transaction>connectionOrTransaction).connection :
+                            connectionOrTransaction;
 
                         // @ts-ignore
                         function rollback(e) {
@@ -110,7 +118,7 @@ export function transactional(spec?: TransactionalMetaData | Object) {
 
                         try {
                             const result = await method.apply(self, [...args,
-                                {transaction: new Transaction(connector, connection)},
+                                {transaction},
                             ]);
                             // @ts-ignore
                             connector.commit(connection, function (err) {

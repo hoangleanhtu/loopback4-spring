@@ -1,6 +1,6 @@
 import {DefaultCrudRepository} from '@loopback/repository';
 import {User} from '../models';
-import {MongoDataSource} from '../datasources';
+import {PostgresDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 
 export class UserRepository extends DefaultCrudRepository<
@@ -8,7 +8,7 @@ export class UserRepository extends DefaultCrudRepository<
   typeof User.prototype.id
 > {
   constructor(
-    @inject('datasources.mongo') dataSource: MongoDataSource,
+    @inject('datasources.postgres') dataSource: PostgresDataSource,
   ) {
     super(User, dataSource);
   }

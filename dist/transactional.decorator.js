@@ -15,7 +15,7 @@ function transactional(spec) {
         const method = descriptor.value;
         // tslint:disable-next-line:no-any
         descriptor.value = async function (...args) {
-            // For MongoDB
+            // For MongoDB: run transaction with retry
             // @ts-ignore
             async function executeInTransaction(client) {
                 async function commitWithRetry(session) {
@@ -85,10 +85,15 @@ function transactional(spec) {
                 return await new Promise(((resolve, reject) => {
                     const isolationLevel = spec ? spec.isolationLevel : IsolationLevel.READ_COMMITTED;
                     // @ts-ignore
-                    connector.beginTransaction(isolationLevel, async function (error, connection) {
+                    connector.beginTransaction(isolationLevel, async function (error, connectionOrTransaction) {
                         if (error) {
                             return reject(error);
                         }
+                        const isTransaction = connectionOrTransaction.connection !== undefined;
+                        const transaction = isTransaction ? connectionOrTransaction :
+                            new loopback_connector_1.Transaction(connector, connectionOrTransaction);
+                        const connection = isTransaction ? connectionOrTransaction.connection :
+                            connectionOrTransaction;
                         // @ts-ignore
                         function rollback(e) {
                             // @ts-ignore
@@ -101,7 +106,7 @@ function transactional(spec) {
                         }
                         try {
                             const result = await method.apply(self, [...args,
-                                { transaction: new loopback_connector_1.Transaction(connector, connection) },
+                                { transaction },
                             ]);
                             // @ts-ignore
                             connector.commit(connection, function (err) {
