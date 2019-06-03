@@ -55,7 +55,7 @@
     "@loopback/rest": "^1.10.4",
     "@loopback/rest-explorer": "^1.1.18",
     "@loopback/service-proxy": "^1.1.6",
-    "loopback-connector-mongodb": "^4.2.0",
+    "loopback-connector-mongodb": "github:hoangleanhtu/loopback-connector-mongodb",
     "loopback-connector-mysql": "^5.3.1",
     "loopback4-spring": "^1.0.2",
     "mongodb": "^3.2.6"

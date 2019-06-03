@@ -1,6 +1,6 @@
 {
   "name": "loopback4-spring",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Inspired by Spring framework",
   "main": "index.js",
   "scripts": {

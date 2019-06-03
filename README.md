@@ -34,6 +34,7 @@ export class SpingLikedExampleApplication extends BootMixin(
 ```
 
 ## Tag your data source as `transactional`
+### Relational database
 ```typescript
 // Import...
 
@@ -52,6 +53,31 @@ export class MysqlDataSource extends juggler.DataSource {
 }
 ```
 
+### Transaction on MongoDB replica set
+```
+npm i -S hoangleanhtu/loopback-connector-mongodb
+npm i && npm run build
+npm run migrate -- --rebuild
+```
+
+```typescript
+// Import here
+import * as config from './mongo.datasource.json';
+
+@bind({
+    tags: ['transactional']
+})
+export class MongoDataSource extends juggler.DataSource {
+  static dataSourceName = 'mongo';
+
+  constructor(
+    @inject('datasources.config.mongo', {optional: true})
+    dsConfig: object = config,
+  ) {
+    super(dsConfig);
+  }
+}
+```
 ## Create `service` classes
 1. Create file with suffix `.service.ts` in folder `src/services`
 2. Class name must be suffix by `Service`, e.g: `UserService`, then you can inject repository:
