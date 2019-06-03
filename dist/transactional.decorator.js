@@ -15,6 +15,63 @@ function transactional(spec) {
         const method = descriptor.value;
         // tslint:disable-next-line:no-any
         descriptor.value = async function (...args) {
+            // For MongoDB
+            // @ts-ignore
+            async function executeInTransaction(client) {
+                async function commitWithRetry(session) {
+                    try {
+                        await session.commitTransaction();
+                    }
+                    catch (error) {
+                        if (error.errorLabels &&
+                            error.errorLabels.indexOf('UnknownTransactionCommitResult') >= 0) {
+                            await commitWithRetry(session);
+                        }
+                        else {
+                            throw error;
+                        }
+                    }
+                }
+                async function runTransactionWithRetry(txnFunc, session) {
+                    try {
+                        return await txnFunc(session);
+                    }
+                    catch (error) {
+                        // If transient error, retry the whole transaction
+                        if (error.errorLabels && error.errorLabels.indexOf('TransientTransactionError') >= 0) {
+                            return await runTransactionWithRetry(txnFunc, session);
+                        }
+                        else {
+                            throw error;
+                        }
+                    }
+                }
+                async function execute(session) {
+                    session.startTransaction(spec);
+                    const result = await method.apply(self, [
+                        ...args,
+                        { session }
+                    ]);
+                    try {
+                        await commitWithRetry(session);
+                        return result;
+                    }
+                    catch (error) {
+                        await session.abortTransaction();
+                        throw error;
+                    }
+                }
+                const session = client.startSession();
+                try {
+                    const result = await runTransactionWithRetry(execute, session);
+                    session.endSession();
+                    return result;
+                }
+                catch (error) {
+                    session.endSession();
+                    throw error;
+                }
+            }
             // @ts-ignore
             const dataSource = this.transactionDataSource;
             // tslint:disable-next-line:no-invalid-this
@@ -63,21 +120,7 @@ function transactional(spec) {
             }
             else if (connector.name === 'mongodb') {
                 // @ts-ignore
-                const session = connector.client.startSession();
-                try {
-                    session.startTransaction();
-                    const result = await method.apply(self, [...args,
-                        { session }
-                    ]);
-                    await session.commitTransaction();
-                    session.endSession();
-                    return result;
-                }
-                catch (e) {
-                    await session.abortTransaction();
-                    session.endSession();
-                    throw e;
-                }
+                return await executeInTransaction(connector.client);
             }
         };
     };

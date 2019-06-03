@@ -13,12 +13,69 @@ export enum IsolationLevel {
     REPEATABLE_READ = 'REPEATABLE READ',
 }
 
-export function transactional(spec?: TransactionalMetaData) {
+export function transactional(spec?: TransactionalMetaData | Object) {
     // tslint:disable-next-line:no-any
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value!;
         // tslint:disable-next-line:no-any
         descriptor.value = async function (...args: any[]) {
+            // For MongoDB: run transaction with retry
+            // @ts-ignore
+            async function executeInTransaction(client: any) {
+
+                async function commitWithRetry(session: any) {
+                    try {
+                        await session.commitTransaction();
+                    } catch (error) {
+                        if (
+                            error.errorLabels &&
+                            error.errorLabels.indexOf('UnknownTransactionCommitResult') >= 0
+                        ) {
+                            await commitWithRetry(session);
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+
+                async function runTransactionWithRetry(txnFunc: Function, session: any): Promise<any> {
+                    try {
+                        return await txnFunc(session);
+                    } catch (error) {
+                        // If transient error, retry the whole transaction
+                        if (error.errorLabels && error.errorLabels.indexOf('TransientTransactionError') >= 0) {
+                            return await runTransactionWithRetry(txnFunc, session);
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+
+                async function execute(session: any) {
+                    session.startTransaction(spec);
+                    const result = await method.apply(self, [
+                        ...args,
+                        {session}
+                    ]);
+                    try {
+                        await commitWithRetry(session);
+                        return result;
+                    } catch (error) {
+                        await session.abortTransaction();
+                        throw error;
+                    }
+                }
+
+                const session = client.startSession();
+                try {
+                    const result = await runTransactionWithRetry(execute, session);
+                    session.endSession();
+                    return result;
+                } catch (error) {
+                    session.endSession();
+                    throw error;
+                }
+            }
             // @ts-ignore
             const dataSource: DataSource = this.transactionDataSource;
             // tslint:disable-next-line:no-invalid-this
@@ -32,7 +89,7 @@ export function transactional(spec?: TransactionalMetaData) {
             // @ts-ignore
             if (connector.beginTransaction) {
                 return await new Promise(((resolve, reject) => {
-                    const isolationLevel: IsolationLevel = spec ? spec.isolationLevel : IsolationLevel.READ_COMMITTED;
+                    const isolationLevel: IsolationLevel = spec ? (<TransactionalMetaData>spec).isolationLevel : IsolationLevel.READ_COMMITTED;
                     // @ts-ignore
                     connector.beginTransaction(isolationLevel, async function (error, connection) {
                         if (error) {
@@ -71,20 +128,7 @@ export function transactional(spec?: TransactionalMetaData) {
                 }));
             } else if (connector.name === 'mongodb') {
                 // @ts-ignore
-                const session = connector.client.startSession();
-                try {
-                    session.startTransaction();
-                    const result = await method.apply(self, [...args,
-                        {session}
-                    ]);
-                    await session.commitTransaction();
-                    session.endSession();
-                    return result;
-                } catch (e) {
-                    await session.abortTransaction();
-                    session.endSession();
-                    throw e;
-                }
+                return await executeInTransaction(connector.client);
             }
 
         };
