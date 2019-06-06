@@ -53,11 +53,11 @@ export function transactional(spec?: TransactionalMetaData | Object) {
 
                 async function execute(session: any) {
                     session.startTransaction(spec);
-                    const result = await method.apply(self, [
-                        ...args,
-                        {session}
-                    ]);
                     try {
+                        const result = await method.apply(self, [
+                            ...args,
+                            {session, __propagateTx: true}
+                        ]);
                         await commitWithRetry(session);
                         return result;
                     } catch (error) {
@@ -76,12 +76,14 @@ export function transactional(spec?: TransactionalMetaData | Object) {
                     throw error;
                 }
             }
+
             // @ts-ignore
             const dataSource: DataSource = this.transactionDataSource;
             // tslint:disable-next-line:no-invalid-this
             const self = this;
 
-            if (!dataSource) {
+            const __propagateTx = args.length > 0 ? args[args.length - 1].__propagateTx : false;
+            if (!dataSource || __propagateTx) {
                 return await method.apply(self, args);
             }
 
@@ -89,7 +91,8 @@ export function transactional(spec?: TransactionalMetaData | Object) {
             // @ts-ignore
             if (connector.beginTransaction) {
                 return await new Promise(((resolve, reject) => {
-                    const isolationLevel: IsolationLevel = spec ? (<TransactionalMetaData>spec).isolationLevel : IsolationLevel.READ_COMMITTED;
+                    const isolationLevel: IsolationLevel = spec ? (<TransactionalMetaData>spec).isolationLevel
+                        : IsolationLevel.READ_COMMITTED;
                     // @ts-ignore
                     connector.beginTransaction(isolationLevel, async function (error, connectionOrTransaction) {
                         if (error) {
@@ -118,7 +121,7 @@ export function transactional(spec?: TransactionalMetaData | Object) {
 
                         try {
                             const result = await method.apply(self, [...args,
-                                {transaction},
+                                {transaction, __propagateTx: true},
                             ]);
                             // @ts-ignore
                             connector.commit(connection, function (err) {

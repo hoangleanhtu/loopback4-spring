@@ -32,6 +32,19 @@ export class UserService {
         return {user, customer};
     }
 
+    @transactional()
+    async callCreateMethod(
+        user: User,
+        customer: Customer,
+        throwError: boolean,
+        options?: Object
+    ): Promise<{user: User, customer: Customer}> {
+
+        await this.userRepository.create(user, options);
+        // Pass options here will propagate transaction as well
+        return this.create(user, customer, throwError, options);
+    }
+
     async listUserAndCustomer() {
         const users = await this.userRepository.find();
         const customers = await this.customerRepository.find();

@@ -48,11 +48,11 @@ function transactional(spec) {
                 }
                 async function execute(session) {
                     session.startTransaction(spec);
-                    const result = await method.apply(self, [
-                        ...args,
-                        { session }
-                    ]);
                     try {
+                        const result = await method.apply(self, [
+                            ...args,
+                            { session, __propagateTx: true }
+                        ]);
                         await commitWithRetry(session);
                         return result;
                     }
@@ -76,14 +76,16 @@ function transactional(spec) {
             const dataSource = this.transactionDataSource;
             // tslint:disable-next-line:no-invalid-this
             const self = this;
-            if (!dataSource) {
+            const __propagateTx = args.length > 0 ? args[args.length - 1].__propagateTx : false;
+            if (!dataSource || __propagateTx) {
                 return await method.apply(self, args);
             }
             const connector = dataSource.connector;
             // @ts-ignore
             if (connector.beginTransaction) {
                 return await new Promise(((resolve, reject) => {
-                    const isolationLevel = spec ? spec.isolationLevel : IsolationLevel.READ_COMMITTED;
+                    const isolationLevel = spec ? spec.isolationLevel
+                        : IsolationLevel.READ_COMMITTED;
                     // @ts-ignore
                     connector.beginTransaction(isolationLevel, async function (error, connectionOrTransaction) {
                         if (error) {
@@ -106,7 +108,7 @@ function transactional(spec) {
                         }
                         try {
                             const result = await method.apply(self, [...args,
-                                { transaction },
+                                { transaction, __propagateTx: true },
                             ]);
                             // @ts-ignore
                             connector.commit(connection, function (err) {

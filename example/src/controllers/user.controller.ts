@@ -55,6 +55,37 @@ export class UserController {
         return await this.userService.create(user, customer, throwError);
     }
 
+    @post('/two-user-one-customer', {
+        requestBody: {
+            content: {
+                'application/json': {
+                    schema: {
+                        'x-ts-type': UserAndCustomer
+                    }
+                }
+            },
+            required: true,
+        },
+        responses: {
+            '200': {
+                content: {
+                    'application/json': {
+                        schema: {
+                            'x-ts-type': UserAndCustomer
+                        }
+                    }
+                }
+            }
+        }
+    })
+    async createTwoUserAndOneCustomer(
+        @requestBody() userAndCustomer: UserAndCustomer,
+        @param.query.boolean('throwError') throwError: boolean = false
+    ) {
+        const {user, customer} = userAndCustomer;
+        return await this.userService.callCreateMethod(user, customer, throwError);
+    }
+
     @get('/all')
     async all() {
         return this.userService.listUserAndCustomer();
