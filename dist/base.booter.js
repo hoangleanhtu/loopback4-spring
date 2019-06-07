@@ -13,9 +13,11 @@ class BaseBooter extends boot_1.BaseArtifactBooter {
         this.types = this.classes.filter(this.isTypeClass);
         if (this.types.length > 0) {
             this.types.forEach(async (cls) => {
-                const ctor = await this.modifyClass(cls);
-                this.app.add(boot_1.Binding.bind(core_1.BindingKey.create(`${constant_1.PREFIX}.${cls.name}`))
-                    .toClass(ctor));
+                await this.modifyClass(cls);
+                this.app.add(core_1.createBindingFromClass(cls, {
+                    name: cls.name,
+                    namespace: constant_1.PREFIX
+                }));
             });
         }
     }
