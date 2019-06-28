@@ -76,7 +76,10 @@ function transactional(spec) {
             const dataSource = this.transactionDataSource;
             // tslint:disable-next-line:no-invalid-this
             const self = this;
-            const __propagateTx = args.length > 0 ? args[args.length - 1].__propagateTx : false;
+            let __propagateTx = false;
+            if (args.length > 0 && args[args.length - 1]) {
+                __propagateTx = args[args.length - 1].__propagateTx;
+            }
             if (!dataSource || __propagateTx) {
                 return await method.apply(self, args);
             }
