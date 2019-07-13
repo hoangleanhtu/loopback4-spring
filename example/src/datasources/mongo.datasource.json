@@ -1,5 +1,5 @@
 {
   "name": "mongo",
   "connector": "mongodb",
-  "url": "mongodb://localhost:27020,localhost:27021/recruit?replicaSet=replicaset"
+  "url": "mongodb://spring:rBkitCruit@localhost:27020,localhost:27021/spring?replicaSet=replicaset"
 }

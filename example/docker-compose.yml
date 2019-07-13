@@ -18,18 +18,23 @@ services:
 #  Add following line in /etc/hosts
 #  127.0.0.1 mongodb-primary mongodb-secondary
   mongodb-primary:
-    image: 'bitnami/mongodb:4.1'
+    image: 'bitnami/mongodb:4.1-ol-7'
     ports:
       - '27020:27020'
     environment:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
       - MONGODB_PORT_NUMBER=27020
       - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=sSubioesd
+      - MONGODB_REPLICA_SET_KEY=devenv
+      - MONGODB_USERNAME=spring
+      - MONGODB_PASSWORD=rBkitCruit
+      - MONGODB_DATABASE=spring
     volumes:
       - 'mongodb_master_data:/bitnami'
 
   mongodb-secondary:
-    image: 'bitnami/mongodb:4.1'
+    image: 'bitnami/mongodb:4.1-ol-7'
     ports:
       - '27021:27021'
     depends_on:
@@ -40,9 +45,11 @@ services:
       - MONGODB_PORT_NUMBER=27021
       - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27020
+      - MONGODB_PRIMARY_ROOT_PASSWORD=sSubioesd
+      - MONGODB_REPLICA_SET_KEY=devenv
 
   mongodb-arbiter:
-    image: 'bitnami/mongodb:4.1'
+    image: 'bitnami/mongodb:4.1-ol-7'
     ports:
       - '27022:27022'
     depends_on:
@@ -53,6 +60,8 @@ services:
       - MONGODB_PORT_NUMBER=27022
       - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27020
+      - MONGODB_PRIMARY_ROOT_PASSWORD=sSubioesd
+      - MONGODB_REPLICA_SET_KEY=devenv
 
 volumes:
   mongodb_master_data:
