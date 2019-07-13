@@ -1,6 +1,6 @@
 {
   "name": "loopback4-spring",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Inspired by Spring framework",
   "main": "index.js",
   "scripts": {
@@ -28,8 +28,8 @@
     "@loopback/build": "^1.5.0"
   },
   "dependencies": {
-    "@loopback/boot": "^1.2.3",
-    "@loopback/core": "^1.6.0",
-    "@loopback/repository": "^1.5.1"
+    "@loopback/boot": "^1.4.4",
+    "@loopback/core": "^1.8.5",
+    "@loopback/repository": "^1.8.2"
   }
 }
